@@ -1,8 +1,8 @@
 <?php
     $select="select menu_head,menu_name,menu_type,menu_php from
     ((select menu_head,menu_name,menu_order,menu_type,menu_php from menu_file as a inner join user_access_file as k
-    on a.menu_id=k.menu_id
-    where a.mas_status=1 and user_type='".$_SESSION['user_type']."'
+    on a.menu_id=k.menu_id or a.menu_id=21 or a.menu_id=16
+    where a.mas_status=1 and user_type='".$_SESSION['user_type']."' group by a.menu_id
     )union all
     (select menu_head,menu_name,menu_order,menu_type,menu_php from menu_file where menu_head in
     (select menu_head from menu_file as a inner join user_access_file as k on a.menu_id=k.menu_id
@@ -10,6 +10,7 @@
     order by menu_head,menu_type,menu_order
     ";
     $result = $conn->query($select);
+//echo $select;	
     $temp_head="-1";
     while($row=$result->fetch_assoc())
     {

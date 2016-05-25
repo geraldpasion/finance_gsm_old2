@@ -1,4 +1,4 @@
-<?php
+ <?php
 function getPost($field,$not='')
     {
         $value="";
@@ -6,9 +6,16 @@ function getPost($field,$not='')
         $value=$_POST[$field];
         return $value;
     }
+function getRequest($field,$not='')
+    {
+        $value="";
+        if(!empty($_REQUEST[$field])&&$_REQUEST[$field]!=$not)
+        $value=$_REQUEST[$field];
+        return $value;
+    }
 function textMaker($label,$id,$value='')
 {
-    return "<tr><th style='text-align:left'>$label</th><td><input type='text' id='$id' name='$id' value=\"".$value." \"></td></tr>";
+    return "<tr><th style='text-align:left'>$label</th><td><input type='text' id='$id' name='$id' value=\"".trim($value)."\"></td></tr>";
 }
 function updateMaker($table,$columns,$val,$trans_num)
 {
@@ -86,11 +93,10 @@ function convert_to_dateTime($date)
 {
     return date("F d, Y h:m:i a",strtotime($date));
 }
-function listMaker($table_name,$order,$select_list,$title)
+function listMaker($table_name,$order,$select_list,$title,$where='')
 {
     global $conn;
     global $access;
-    //print_r($access);
     $sel=" ";
      if($order=='secretary'|| $order=='engineer')
      $sel=" ,account_executive_id";
@@ -117,7 +123,7 @@ function listMaker($table_name,$order,$select_list,$title)
         $sel.=",id";
         $this_id="id";
      }
-    $select="select ".toStringList($select_list).$sel."  from $table_name order by $order";
+    $select="select ".toStringList($select_list).$sel."  from $table_name $where order by $order";
    // echo $select;
     ?>
     <h2><?php echo $title;?></h2>
@@ -145,14 +151,6 @@ function listMaker($table_name,$order,$select_list,$title)
     $department_list=array();
     while($row=$result->fetch_assoc())
     {
-        /*
-        if(($order=='secretary'|| $order=='engineer') && empty($executive[$row['account_executive_id']]))
-        {
-            $select="select account_executive from master_account_executive_file where account_executive_id='".$row['account_executive_id']."' limit 1";
-            $result2= $conn->query($select);
-            $row2=$result2->fetch_assoc();
-            $executive[$row['account_executive_id']]=$row2['account_executive'];
-        }*/
         echo "<tr>";
             for($a=0;$a<count($select_list);$a++)
             {
@@ -241,7 +239,16 @@ function selectMakerValue($label,$id,$array,$function,$value,$val='' )
 function sendText($text,$phone_number,$smsc_id)
 {
 	$text=urlencode($text);
+	try {
 	$response = file_get_contents("http://127.0.0.1:13013/cgi-bin/sendsms?user=sms-app&pass=app125&text=".$text."&to=".$phone_number."&smsc_id="+$smsc_id );
+	}
+	catch(Exception $e)
+	{
+		echo "<script>alert('Failed to send message')</script>";
+	}
+     catch (ErrorException $e) {
+    // ...
+   }
 }
 function selectMakerEach($label,$id,$array,$function , $default='')
 {

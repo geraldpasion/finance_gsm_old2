@@ -1,5 +1,6 @@
 <?php
 session_start();
+include 'string.php';
 include 'connect.php';
 if($_REQUEST['xstatus']=='getRequestor')
 {
@@ -34,7 +35,7 @@ if($_REQUEST['xstatus']=='readyForPickUp')
     	$date_set=",release_date=now()";
     	$new_status="Receive Cash Request";
     }
-    if($status=='For Approval')
+    if($status==$for_qa_approval)
     {
     	$date_set=",approved_date=now()";
     }
@@ -51,9 +52,11 @@ if($_REQUEST['xstatus']=='change_status')
 
     //'Request for Cash Release','Ready for pick up','Receive Cash Request'
     $new_status="";
-    if($status=='For Approval')
+    if($status==$for_qa_approval)
+    $new_status=$for_ae_approval;
+    else if($status==$for_ae_approval)
     $new_status="Request Release";
-    else if($status=='Request Release')
+    else if($status==$request_release_btn)
     $new_status="Ready for pick up";
     else if($status=='Ready for pick up')
     $new_status="Receive Cash Request";

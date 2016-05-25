@@ -13,12 +13,43 @@ function change_info(type)
         else
             document.getElementById('dept_div').style.display='none';
 }
+function submit_button()
+{
+	type=$('#account_type').val()
+	first_name=$('#first_name').val()
+    last_name=$('#last_name').val()
+    department=$('#department').val()
+    account_executive=$('#account_executive').val()
+    phone_number=$('#phone_number').val()
+    
+    
+    
+    if ((type=='Secretary' ||type=='Engineer') &&(account_executive==''||account_executive=='Select'))
+           alert("Please enter Account Executive")
+     else if (type=='Account Executive' &&(department==''||department=='Select')) 
+           alert("Please enter department")
+      else if(first_name=='')
+       alert("Please enter First Name")
+    else if(last_name=='')
+     alert("Please enter Last Name")
+    else if(phone_number=='')
+       alert("Please enter Phone Number")
+    else if (type=='Select'||type=='')
+    alert("Please enter account type")
+    else
+	{
+	$('#status').val("Submit")
+	 document.form1.submit();
+	}
+
+}
 </script>
 <?php
 //$addType=$_REQUEST['add_type'];
 //$title=get_title($addType);
 
 echo "<form name=form1 id=form1 method=post>";
+echo "<input type='hidden' id='status' name='status'>";
 $trans_no="";
 if(!empty($_POST['update_btn']))
 {
@@ -64,7 +95,7 @@ if(!empty($_REQUEST['trans_num']))
     echo "<input type='hidden' name='trans_num' value='$account_id'>";
 }
 
-if(!empty($_POST['submit_btn']))
+if(!empty($_POST['status']))
 {
     $type=$_POST['account_type'];
     $id=getId('master_address_file','account_id');
@@ -138,7 +169,7 @@ if(!empty($_POST['submit_btn']))
     echo "<tr>";
         echo "<td colspan=2 style='text-align:center'>";
           if($account_id=='')
-            echo "<input type='SUBMIT' name='submit_btn' value='Submit' style='margin:15px'>";
+            echo "<input type='button' onclick='alert(\"kai\");submit_button()' name='submit_btn' value='Submit' style='margin:15px'>";
             else
             echo "<input type='Submit' name='update_btn' value='Update' style='margin:15px'>";
             

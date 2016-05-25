@@ -12,6 +12,10 @@ include 'page_header.php';
             document.getElementById('department_div').style.display='block';
         else
             document.getElementById('department_div').style.display='none';
+        if (type=='Account Executive') 
+            document.getElementById('department_div').style.display='block';
+        else
+            document.getElementById('department_div').style.display='none';
        
          if (type=='Secretary' ||type=='QA')
             document.getElementById('phone_id').style.display='block';
@@ -39,10 +43,10 @@ $username="";
         $first_name=getPost('first_name','Choose');
         $last_name=getPost('last_name','Choose');
         $account_executive_id=" ";
-        if($user_type=='Secretary' || $user_type=='Finance Head')
+        if($user_type=='Secretary' || $user_type=='Finance Head'||$user_type=='Account Executive')
         {
             $account_executive_id=$_POST['finance_head'];
-            if( $user_type=='Finance Head')
+            if( $user_type=='Finance Head' ||$user_type=='Account Executive')
             $user_type='account executive';
             else
             {
@@ -129,7 +133,7 @@ $username="";
     echo textMaker('Username','user_name',$username);
     echo textMaker('First Name','first_name',$first_name);
     echo textMaker('Last Name','last_name',$last_name);
-    echo selectMaker('User Type','user_type',array('Finance Head','Secretary','QA','Admin','Cash Release'),'get_type(this.value)',$user_type);
+    echo selectMaker('User Type','user_type',array('Finance Head','Account Executive','Secretary','QA','Admin','Cash Release'),'get_type(this.value)',$user_type);
     //$label,$id,$array,$function,$value,$val=''
     echo "<tr><td colspan=2><div style='display:none' id='phone_id'>";
     echo "<table>";
@@ -158,4 +162,11 @@ $username="";
     echo "<script>get_type(\"$user_type\")</script>";
     ?>
 </table>
+<script>
+
+	if($('#user_name').val()!='')
+	{
+		$('#user_name').attr('readonly','readonly')
+	}		
+</script>
 </form>

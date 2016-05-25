@@ -7,11 +7,20 @@ include 'page_header.php';
         document.getElementById('sms_row'+a).style.display='none'
         document.getElementById('2sms_row'+a).style.display='none'
     }
-    function approve_btn(trans_num)
+    function approve_ae_btn(status,trans_num)
     {
-        if (confirm("Are you sure you want to Approve this transaction?")) {
+        if (confirm("Are you sure you want to Approve this transaction by Account Execeutive ?")) {
+            url="xstatus=change_status&status="+status+"&trans_num="+trans_num
+            loadXMLDoc('get_type.php?'+url,reloadPage)
             
-            url="xstatus=change_status&status=Request Release&trans_num="+trans_num
+            return false;
+        }
+    }
+     function approve_QA_btn(status,trans_num)
+    {
+        if (confirm("Are you sure you want to Approve  this transaction	by QA?")) {
+            
+            url="xstatus=change_status&status="+status+"&trans_num="+trans_num
             loadXMLDoc('get_type.php?'+url,reloadPage)
             
             return false;
@@ -20,7 +29,7 @@ include 'page_header.php';
     function reloadPage(result)
     {
         page_type=document.getElementById('page_type').value
-        window.location.assign('view_for_approve.php?page_type='+page_type);
+        window.location.assign('view_data_combine.php?type='+page_type);
     }
     function edit_btn(page_type,trans_num)
     {
@@ -135,6 +144,15 @@ Message:".$_REQUEST['chat_box'];
             echo $engineer_name;
             else if($val[$a]=='date_created')
             echo convert_to_dateTime($row[$val[$a]]);
+			else if($val[$a]=='status')
+			{
+				$value=$row[$val[$a]];
+				if($value==$for_qa_approval)
+				$value=$qa_text;
+				else if($value==$for_ae_approval)
+				$value=$ae_text;
+				echo $value;	
+			}
             else if($val[$a]!='')
             echo $row[$val[$a]];
             
@@ -210,17 +228,24 @@ Message:".$_REQUEST['chat_box'];
         {
             echo "<tr><th style='width:115px;text-align:left'>Rejected By</th><td>".$row2['rejected_by']."</td></tr>";
             echo "<tr><th style='width:115px;text-align:left'>Date Rejected</th><td>".$row2['date_created']."</td></tr>";
-            echo "<tr><th style='width:115px;text-align:left'>Status</th><td>".$row2['status']."</td></tr>";
+            echo "<tr><th style='width:115px;text-align:left'>Status</th><td>";
+		
+			$value=$row2['status'];
+			
+			echo $value."</td></tr>";
             echo "<tr><th style='width:115px;text-align:left'>Remarks</th><td>name".$row2['remarks']."</td></tr></tr>";
            
            
         }
          echo "</table></td></tr>";
     }
-    if(($status=='pending'||$row['mas_status']!=1) && $row['created_by']==$_SESSION['uname'])
+
+    if(($status=='pending'||$row['mas_status']!=1) && $row['created_by']==$_SESSION['uname'] )
     echo "<tr><td colspan=2 style='text-align:center;padding-top:10px'><input onclick='edit_btn(\"".$type."\",".$trans_num.")' style='padding:10px;height:50px' type='button' value='Edit'></td></tr>";
-    else if($status=='For Approval')
-    echo "<tr><td colspan=2 style='text-align:center;padding-top:10px'><input onclick='approve_btn(".$trans_num.")' style='padding:10px;height:50px' type='button' value='Approve'></td></tr>";
+    else if($status==$for_qa_approval && !empty($access[$for_qa_page]))
+    echo "<tr><td colspan=2 style='text-align:center;padding-top:10px'><input onclick='approve_QA_btn(\"$for_qa_approval\",".$trans_num.")' style='font-size:14px;padding:25px;height:50px' type='button' value='$qa_approve_btn'></td></tr>";
+    else if($status==$for_ae_approval&& !empty($access[$for_ae_page]))
+    echo "<tr><td colspan=2 style='text-align:center;padding-top:10px'><input onclick='approve_ae_btn(\"$for_ae_approval\",".$trans_num.")' style='font-size:14px;padding:25px;height:50px' type='button' value='$ae_approve_btn'></td></tr>";
     if($status!='pending')
     {
         echo "<tr><th colspan=2><h2>Chat Box</h2> </th></tr>";

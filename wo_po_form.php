@@ -1,6 +1,7 @@
 <?php
     include 'page_header.php';
             $trans_num="";
+$update_type="";
     ?>
     <div id='child'></div>
     <script>
@@ -196,7 +197,7 @@
        $table="po_file";
        $engineer=getPost('engineer','Choose');
        $page=$_POST['page'];
-       $status="For Approval";
+       $status=$for_qa_approval;	
        if($_POST['status']=="Save")
        $status="pending";
         $number_code=$_POST['number_code'];
@@ -273,32 +274,31 @@ Item:".$item;
                     $total_amount+=($quantity*$unit_price);  
            }
             $result=updateMaker($table,array('total_amount'),array($total_amount),"where trans_no='$trans_num'");  
-             
-            $type1="type=With Po";
             if($type=="withoutpo")
             $type1="type=Without Po";
-                $trans_num=$trans_no;	
-               if($status!='Save')
+                $trans_no=$trans_num;
+               if($status!='Save'&&$status!='pending')
                {
                     echo "<script>alert('Successfull Transaction');</script>";
            
                 $select="select phone_number,smsc_id from master_address_file where account_type='Account Executive' and mas_status=1 and account_id='$requestor' limit 1";
                 $result = $conn->query($select);
+
                 $row=$result->fetch_assoc();
                 
-                 send_text($text,$row['phone_number'],$smsc_id); 
+                 sendText($text,$row['phone_number'],$row['smsc_id']); 
                 //$text=urlencode($text);
                 //$response = file_get_contents("http://127.0.0.1:13013/cgi-bin/sendsms?user=sms-app&pass=app125&text=$text&to=".$row['phone_number']);
                 	$trans_no="";
 					$trans_num="";
 					$number_code="";
-              
                }
-             //    echo "<script>document.getElementById('form1').action='view_data.php?".$type1."';";
-                 
-              // echo "document.form1.submit();";
+				if($status==$for_qa_approval)
+				{
+            		   echo "<script>document.getElementById('form1').action='view_data_combine.php?".$type1."';";
+              			echo "document.form1.submit();";
+				}
               echo " </script>";
-           
         }
         else 
         {
@@ -326,12 +326,13 @@ Item:".$item;
            
            if(!empty($requestor) && $requestor!=0)
            {
-            $select="select phone_number,concat(first_name,' ',last_name) as name from master_address_file where
+            $select="select phone_number,concat(first_name,' ',last_name) as name,smsc_id from master_address_file where
             account_type='Account Executive' and mas_status=1 and account_id='$requestor' limit 1";
             $result = $conn->query($select);
             $row=$result->fetch_assoc();
             $phone_number=$row['phone_number'];
             $requestor_name=$row['name'];
+			$smsc_id=$row['smsc_id'];
            }
            $select="select concat(first_name,' ',last_name) as name from master_address_file where
            account_type='Secretary' and mas_status=1 and account_id='$secretary' limit 1";
@@ -394,36 +395,34 @@ Total Amount:".$total_amount;
             $type1="type=With Po";
             if($type=="withoutpo")
             $type1="type=Without Po";
-            
             $trans_num=$trans_no;
-            
                if($status!='Save' && $status!='pending')
                {
                   // $text=urlencode($text);
-                   send_text($text,$phone_number);
-                   
-                //    echo $response;
-ECHO "<br>Trans_num".$trans_num." ".$trans_no;
-		$trans_no="";
-$trans_num="";
-$number_code="";	
+                   sendText($text,$phone_number,$smsc_id);
+					$trans_no="";
+					$trans_num="";
+					$number_code="";	
                     echo "<script>alert('Successfull Transaction');</script>";
                }
-              //  echo "<script>document.getElementById('form1').action='view_data.php?".$type1."';";
-               
-             //  echo " document.form1.submit();";
-               
-               echo "</script>";
+			$_REQUEST['trans_num']=$trans_num;
+			 if($status=="For Approval")
+			{
+				echo "<script>document.getElementById('form1').action='view_data_combine.php?".$type1."';";
+	            echo " document.form1.submit();";
+				
+			}
+			echo "</script>";
+			$update_type="Edit";  
         }
-        
-    }
+   }
     if($type=="withoutpo")
     $type="Without PO";
     else
     $type="With Po";
     ?>  
         <input type='hidden' id='status' name='status'>
-        <input type='hidden' id='update_type' name='update_type'>
+        <input type='hidden' id='update_type' name='update_type' value='<?php echo $update_type;?>' >
         <h2><?PHP ECHO $type;?></h2>
     <table>
     <?php
@@ -437,15 +436,12 @@ $number_code="";
         $page="";
         $supplier="";
         $payment_type="";
-
-        $item_description="";
+		$item_description="";
     if($trans_num!='')
     {
         echo "<input type='hidden' name='trans_num' id='trans_num' value='$trans_num'>";     
         $select="select * from po_file where trans_no='$trans_num' limit 1";
         $result = $conn->query($select);
-       // echo $select;
-       
         $row= $result->fetch_assoc();
         echo "<input type='hidden' name='number_code' id='number_code' value='".$row['number_code']."'>";
         $number_code=$row['number_code'];

@@ -1,7 +1,27 @@
 <?php
 include 'page_header.php';
+?>
+<script>
+function cancel_btn()
+{
+ 	document.getElementById('form1').action = 'sms_slot_list.php'
+    document.form1.submit();
+}
+function submit_btn()
+{
+	if($('#sms_slot').val()=='' ||$('#sms_slot').val()=='smsc')
+	alert("Please Enter SMS Slot")
+	else if($('#phone_number').val()=='')
+	alert("Please enter a phone number")
+	else
+	 document.form1.submit();
+
+}
+</script>
+<?php
 echo "<form name=form1 id=form1 method=post>";
-if(!empty($_POST['submit_btn']))
+echo "<input type='hidden' id='status' name='status' value=''>
+if(!empty($_POST['status']))
 {
     $sms_slot=$_POST['sms_slot'];
     $phone_number=$_POST['phone_number'];
@@ -54,12 +74,14 @@ if(!empty($_REQUEST['trans_num']))
     echo textMaker('Phone Number','phone_number',$phone_number);
     echo "<tr>";
         echo "<td colspan=2 style='text-align:center'>";
-            if(empty($_REQUEST['trans_num']))
-            echo "<input type='Submit' name='submit_btn' value='Submit' style='margin:15px'>";
+            
+
+		if(empty($_REQUEST['trans_num']))
+            echo "<input type='button'  onclick='submit_btn()'  name='submit_btn' value='Submit' style='margin:15px'>";
             else
             echo "<input type='submit' name='update_btn' value='Update' style='margin:15px'>";
             
-            echo "<input type='button' value='Cancel' style='margin:15px'>";
+            echo "<input type='button' onclick='cancel_btn()' value='Cancel' style='margin:15px'>";
         echo "</td>";
     echo "</tr>";
     ?>

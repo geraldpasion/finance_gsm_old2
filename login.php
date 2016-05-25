@@ -4,8 +4,9 @@ if(!empty($_POST['sub_btn']))
 {
     $username=$_POST['username'];
     $password=$_POST['password'];
-    $select="select user_type from user_file where user_name='".addslashes($username)."' and password='".addslashes($password)."' limit 1";
+    $select="select user_type from user_file where user_name='".addslashes($username)."' and password='".addslashes($password)."' and mas_status=1 limit 1";
     $result = $conn->query($select);
+//echo $select;
     if ($result->num_rows > 0) 
     {
         $row=$result->fetch_assoc();
@@ -47,5 +48,24 @@ if(!empty($_SESSION['uname']))
     </tr>
     
 </table>
+<Table>
+	<TR><TH>Update</TH></tr>
+	<tr>
+		<td>
+		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+		April 15 2016
+		<BR>Removed Error on submit
+		<BR>File Upload
+		<BR>Combination of Po Viewing on qa approved link
+		<BR>Some GUI
+		<br>Inactivation User
+		<br>Department is required. Username not editable 
+		<br>sms slot validation of empty fields
+		<br>SMS DELETE
+		<BR>Pop up
+		
+		</td>
+	</tr>
+</Table>
 </div>
 </form>
